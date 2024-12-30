@@ -3,6 +3,7 @@ let currentNum = '';
 let currentOp;
 let previousNum = 0;
 let previousOp;
+let decPressed = false;
 
 const screen = document.querySelector('#screen');
 screen.textContent = sum;
@@ -49,16 +50,30 @@ const updateScreen = function(num, op) {
 buttons.addEventListener('click', (event) => {
     let target = event.target;
 
+    if(previousOp) {
+        //reset button colors
+        previousOp.style.opacity = 1.0;
+    }
+
     switch(target.className) {
         case 'num':
-            currentNum += target.textContent;
+            //keep the current number unless an operator is pressed, this helps the misc buttons work in the case of pressing an operator but no number then selecting a misc button
+            if(currentOp) {
+                currentNum = '';
+            }
+            //check if the decimal button was pressed so we only add it once
+            if (target.id === 'decimal' && decPressed) {
+                break;
+            } else if (target.id === 'decimal' && !decPressed) {
+                currentNum += target.textContent;
+                decPressed = true;
+            } else {
+                currentNum += target.textContent;
+            };
             updateScreen(currentNum);
             break;
         case 'operator':
-            if(previousOp) {
-                previousOp.style.opacity = 1.0;
-            }
-            if (target.id === 'equals' && currentNum !== '') {
+            if (target.id === 'equals' && currentNum !== '' && currentOp) {
                 currentNum = Number(currentNum);
                 sum = operate(currentOp, previousNum, currentNum);
                 updateScreen(sum, 'equals');
@@ -68,16 +83,16 @@ buttons.addEventListener('click', (event) => {
                 currentOp = target.id;
                 previousNum = Number(currentNum);
                 previousOp = target;
-                currentNum = '';
                 target.style.opacity = 0.8;
-                //update button state to pressed
             };
+            decPressed = false;
             break;
         case 'misc':
             switch(target.id) {
                 case 'clear':
                     currentNum = '';
                     currentOp = '';
+                    decPressed = false;
                     updateScreen('0');
                     break;
                 case 'plusminus':
@@ -89,8 +104,8 @@ buttons.addEventListener('click', (event) => {
                     updateScreen(currentNum);
                     break;
                 case 'percentage':
-                    // move decimal place two spaces, 1 to .01
-                    //update screen
+                    currentNum = Number(currentNum) / 100;
+                    updateScreen(currentNum);
                     break;
             }
             break;
