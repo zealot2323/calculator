@@ -1,7 +1,8 @@
 let sum = 0;
 let currentNum = '';
-let currentOp = '';
+let currentOp;
 let previousNum = 0;
+let previousOp;
 
 const screen = document.querySelector('#screen');
 screen.textContent = sum;
@@ -54,17 +55,21 @@ buttons.addEventListener('click', (event) => {
             updateScreen(currentNum);
             break;
         case 'operator':
-            if (target.id === 'equals') {
+            if(previousOp) {
+                previousOp.style.opacity = 1.0;
+            }
+            if (target.id === 'equals' && currentNum !== '') {
                 currentNum = Number(currentNum);
                 sum = operate(currentOp, previousNum, currentNum);
                 updateScreen(sum, 'equals');
                 currentOp = '';
                 currentNum = '';
-            } else {
+            } else if (target.id !== 'equals') {
                 currentOp = target.id;
                 previousNum = Number(currentNum);
+                previousOp = target;
                 currentNum = '';
-
+                target.style.opacity = 0.8;
                 //update button state to pressed
             };
             break;
