@@ -1,0 +1,33 @@
+#calculator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    background-color: black;
+}
+
+#screen, #buttons {
+    flex: auto;
+}
+
+#screen {
+    font-size: 36pt;
+    background-color: blanchedalmond;
+}
+
+#buttons {
+    display: flex;
+    flex-wrap: wrap;
+    width: 400px;
+}
+
+button {
+    min-height: 100px;
+    min-width: 100px;
+    flex-shrink: 0;
+    flex-basis: auto;
+    border-style: 2px solid black;
+    border-radius: 5px;
+    font-size: 20pt;
+}
