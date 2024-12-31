@@ -1,8 +1,8 @@
 let displayValue = 0;
 let currentNum = '';
-let currentOp;
 let previousNum = 0;
 let previousOp;
+let previousOpTarget;
 
 const screen = document.querySelector('#screen');
 screen.textContent = displayValue;
@@ -39,15 +39,20 @@ const operate = function(op, a, b) {
 };
 
 const updateScreen = function() {
+     
+    if (displayValue.length > 9) {
+        screen.textContent = displayValue.substring(0, 10);
+    } else {
         screen.textContent = displayValue;
+    }
 }
 
 buttons.addEventListener('click', (event) => {
     let target = event.target;
 
-    if(previousOp) {
+    if(previousOpTarget) {
         //reset button colors
-        previousOp.style.opacity = 1.0;
+        previousOpTarget.style.opacity = 1.0;
     }
 
     switch(target.className) {
@@ -57,28 +62,36 @@ buttons.addEventListener('click', (event) => {
             updateScreen();
             break;
         case 'operator':
-            if (target.id === 'equals' && currentNum !== '' && currentOp) {
-                currentNum = Number(currentNum);
-                displayValue = operate(currentOp, previousNum, currentNum);
-                updateScreen();
-                currentOp = '';
-                currentNum = '';
-            } else if (target.id !== 'equals') {
-                currentOp = target.id;
+            
+            if(!previousOp && target.id !== 'equals') {
                 previousNum = Number(currentNum);
+                previousOp = target.id;
                 currentNum = '';
-                previousOp = target;
+            } else if (previousOp && target.id !== 'equals') {
+                displayValue = operate(previousOp, Number(previousNum), Number(currentNum)).toString();
+                updateScreen();
+                previousNum = Number(displayValue);
+                previousOp = target.id;
+                currentNum = '';
+            } else if (target.id === 'equals' && currentNum && previousOp) {
+                displayValue = operate(previousOp, Number(previousNum), Number(currentNum)).toString();
+                updateScreen();
+                previousNum = Number(displayValue);
+                previousOp = null;
+                currentNum = '';
+            };
+            
+            if (target.id !== 'equals') {
+                previousOpTarget = target;
                 target.style.opacity = 0.8;
             };
-            decPressed = false;
             break;
         case 'misc':
             switch(target.id) {
                 case 'clear':
                     currentNum = '';
-                    currentOp = '';
-                    decPressed = false;
-                    displayValue = '0';
+                    previousOp = '';
+                    displayValue = 0;
                     updateScreen();
                     break;
                 case 'plusminus':
