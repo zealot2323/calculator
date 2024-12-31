@@ -60,7 +60,7 @@ button {
     background-color: chocolate;
 }
 
-.num {
+.num, #decimal {
     background-color: darksalmon;
 }
 

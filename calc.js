@@ -1,12 +1,11 @@
-let sum = 0;
+let displayValue = 0;
 let currentNum = '';
 let currentOp;
 let previousNum = 0;
 let previousOp;
-let decPressed = false;
 
 const screen = document.querySelector('#screen');
-screen.textContent = sum;
+screen.textContent = displayValue;
 
 const buttons = document.querySelector('#buttons');
 
@@ -39,12 +38,8 @@ const operate = function(op, a, b) {
     }
 };
 
-const updateScreen = function(num, op) {
-    if (op === 'equals') {
-        screen.textContent = sum;
-    } else {
-        screen.textContent = num;
-    }
+const updateScreen = function() {
+        screen.textContent = displayValue;
 }
 
 buttons.addEventListener('click', (event) => {
@@ -56,32 +51,22 @@ buttons.addEventListener('click', (event) => {
     }
 
     switch(target.className) {
-        case 'num':
-            //keep the current number unless an operator is pressed, this helps the misc buttons work in the case of pressing an operator but no number then selecting a misc button
-            if(currentOp) {
-                currentNum = '';
-            }
-            //check if the decimal button was pressed so we only add it once
-            if (target.id === 'decimal' && decPressed) {
-                break;
-            } else if (target.id === 'decimal' && !decPressed) {
-                currentNum += target.textContent;
-                decPressed = true;
-            } else {
-                currentNum += target.textContent;
-            };
-            updateScreen(currentNum);
+        case 'num': 
+            currentNum += target.textContent;
+            displayValue = currentNum;
+            updateScreen();
             break;
         case 'operator':
             if (target.id === 'equals' && currentNum !== '' && currentOp) {
                 currentNum = Number(currentNum);
-                sum = operate(currentOp, previousNum, currentNum);
-                updateScreen(sum, 'equals');
+                displayValue = operate(currentOp, previousNum, currentNum);
+                updateScreen();
                 currentOp = '';
                 currentNum = '';
             } else if (target.id !== 'equals') {
                 currentOp = target.id;
                 previousNum = Number(currentNum);
+                currentNum = '';
                 previousOp = target;
                 target.style.opacity = 0.8;
             };
@@ -93,7 +78,8 @@ buttons.addEventListener('click', (event) => {
                     currentNum = '';
                     currentOp = '';
                     decPressed = false;
-                    updateScreen('0');
+                    displayValue = '0';
+                    updateScreen();
                     break;
                 case 'plusminus':
                     if (currentNum.startsWith('-')) {
@@ -101,13 +87,22 @@ buttons.addEventListener('click', (event) => {
                     } else {
                         currentNum = `-${currentNum}`;
                     }
-                    updateScreen(currentNum);
+                    displayValue = currentNum;
+                    updateScreen();
                     break;
                 case 'percentage':
                     currentNum = Number(currentNum) / 100;
-                    updateScreen(currentNum);
+                    displayValue = currentNum;
+                    updateScreen();
                     break;
+            };
+            break;
+        case 'decimal':
+            if(!displayValue.includes('.')) {
+                currentNum += '.';
+                displayValue = currentNum;
+                updateScreen();
             }
             break;
-    }
+    };
 });
